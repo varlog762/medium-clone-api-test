@@ -14,6 +14,27 @@ const {
 } = require("../lib/relations-map")
 
 module.exports = {
+/**
+ * Retrieves an article by its slug and attaches associated data to the context.
+ * 
+ * @param {string} slug - The slug of the article to retrieve.
+ * @param {object} ctx - The Koa context object.
+ * @param {function} next - The next middleware function in the Koa stack.
+ * 
+ * @throws 404 - Throws an error if the slug is not provided or the article is not found.
+ * 
+ * This function performs the following:
+ * - Validates and retrieves the article from the database using the provided slug.
+ * - Retrieves and attaches the article's tags to the article object.
+ * - Sets the favorited status of the article to false initially.
+ * - Retrieves and attaches the author's details to the article object.
+ * - Sets the author's following status based on the current user's following status.
+ * - Checks if the article is favorited by the current user and updates the favorited status.
+ * - Attaches the article, favorites, author, tag list, and tag relations to the context parameters.
+ * - Calls the next middleware function.
+ * - Removes the author's id from the context parameters for privacy.
+ */
+
   async bySlug(slug, ctx, next) {
     ctx.assert(slug, 404)
 
@@ -86,6 +107,21 @@ module.exports = {
 
     delete ctx.params.author.id
   },
+
+  /**
+   * Retrieves a list of articles based on provided query parameters and attaches the data to the context.
+   *
+   * @param {object} ctx - The Koa context object containing state and query parameters.
+   * 
+   * This function performs the following:
+   * - Extracts query parameters such as offset, limit, tag, author, and favorited from the context.
+   * - Constructs a database query to select articles along with their associated author, tags, and favorited status.
+   * - Filters articles based on author, favorited, and tag criteria if provided.
+   * - Joins relevant tables to fetch complete article data including author details and tags.
+   * - Maps the retrieved articles using predefined relation maps and formats the data.
+   * - Calculates the total count of articles matching the criteria.
+   * - Attaches the list of articles and the total count to the context body.
+   */
 
   async get(ctx) {
     const { user } = ctx.state
@@ -179,10 +215,32 @@ module.exports = {
     ctx.body = { articles, articlesCount }
   },
 
+  /**
+   * Returns a single article specified by the context params based on the article id.
+   * 
+   * @param {object} ctx - The Koa context object containing the article data.
+   * 
+   * This function performs the following:
+   * - Retrieves an article from the context params.
+   * - Returns the article data.
+   */
   async getOne(ctx) {
     ctx.body = { article: ctx.params.article }
   },
 
+  /**
+   * Creates a new article.
+   * 
+   * @param {object} ctx - The Koa context object containing the article data.
+   * 
+   * This function performs the following:
+   * - Validates the article data using the schema.
+   * - Generates a slug for the article.
+   * - Inserts the article into the articles table.
+   * - Handles duplicate slugs by appending a UUID to the slug.
+   * - If the article has tags, validates the tags, inserts them into the tags table, and inserts the article-tag relations into the articles_tags table.
+   * - Formats the article data and returns it in the context body.
+   */
   async post(ctx) {
     const { body } = ctx.request
     let { article } = body
@@ -255,6 +313,21 @@ module.exports = {
 
     ctx.body = { article }
   },
+
+/**
+ * Updates an existing article in the database.
+ * 
+ * This function first checks if the article being updated is owned by the user
+ * making the request. It then validates and updates the article with any new
+ * fields provided in the request body. If a new title is provided, a new slug
+ * is generated. The function handles potential conflicts with slugs by appending
+ * a unique identifier if necessary. If the updated article includes a tag list,
+ * the tags are validated and associated with the article. The function ensures
+ * that the updated article is returned in the response body.
+ *
+ * @param {Object} ctx - The context object containing request and state information.
+ * @throws {ValidationError} If the article is not owned by the user making the request.
+ */
 
   async put(ctx) {
     const { article } = ctx.params
@@ -374,6 +447,19 @@ module.exports = {
     ctx.body = { article: newArticle }
   },
 
+  /**
+   * Deletes an article.
+   *
+   * @param {object} ctx - The Koa context object.
+   * @param {object} ctx.params - The article to delete.
+   *
+   * This function performs the following:
+   * - Asserts the article has not been deleted by another user.
+   * - Deletes the article.
+   * - Deletes the article's tags.
+   * - Deletes the article from the user's favorites.
+   * - Returns an empty response body.
+   */
   async del(ctx) {
     const { article } = ctx.params
 
@@ -401,6 +487,24 @@ module.exports = {
   },
 
   feed: {
+    /**
+     * Retrieves the articles written by the users the authenticated user follows.
+     *
+     * @param {object} ctx - The Koa context object.
+     * @param {object} ctx.state - The Koa context state object.
+     * @param {object} ctx.state.user - The authenticated user.
+     * @param {object} ctx.query - The Koa context query object.
+     * @param {string} ctx.query.offset - The number of articles to skip.
+     * @param {string} ctx.query.limit - The number of articles to limit the query to.
+     *
+     * This function performs the following:
+     * - Retrieves the ids of the users the authenticated user follows.
+     * - Retrieves the articles written by the followed users.
+     * - Retrieves the count of the articles written by the followed users.
+     * - Maps the articles to the article relation map.
+     * - Formats the articles and tags.
+     * - Returns the articles and the count of the articles.
+     */
     async get(ctx) {
       const { user } = ctx.state
       const { offset, limit } = ctx.query
@@ -456,6 +560,21 @@ module.exports = {
   },
 
   favorite: {
+/**
+ * Favorites an article for the authenticated user.
+ *
+ * @param {object} ctx - The Koa context object containing the request parameters and state.
+ * @param {object} ctx.params - The context parameters including the article to be favorited.
+ * @param {object} ctx.state.user - The authenticated user.
+ *
+ * This function performs the following:
+ * - Checks if the article is already favorited by the user.
+ * - Inserts a new favorite record for the article and the user in the database.
+ * - Increments the article's favorites count.
+ * - Updates the article's favorited status.
+ * - Returns the updated article data in the context body.
+ */
+
     async post(ctx) {
       const { article } = ctx.params
 
@@ -480,6 +599,21 @@ module.exports = {
 
       ctx.body = { article: ctx.params.article }
     },
+
+/**
+ * Unfavorites an article for the authenticated user.
+ *
+ * @param {object} ctx - The Koa context object containing the request parameters and state.
+ * @param {object} ctx.params - The context parameters including the article to be unfavorited.
+ * @param {object} ctx.state.user - The authenticated user.
+ *
+ * This function performs the following:
+ * - Checks if the article is not favorited by the user and returns early if so.
+ * - Deletes the favorite record for the article and the user from the database.
+ * - Decrements the article's favorites count.
+ * - Updates the article's favorited status.
+ * - Returns the updated article data in the context body.
+ */
 
     async del(ctx) {
       const { article } = ctx.params

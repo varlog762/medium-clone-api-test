@@ -2,6 +2,11 @@ const { ValidationError } = require("yup")
 const http = require("http")
 
 class AuthenticationError extends Error {
+  /**
+   * Construct an AuthenticationError with a given message.
+   * @param {string} [message=http.STATUS_CODES[401]] - The message to be
+   *   associated with this error.
+   */
   constructor(message = http.STATUS_CODES[401]) {
     super(message)
     this.message = message
@@ -13,6 +18,12 @@ class AuthenticationError extends Error {
 }
 
 class AuthorizationError extends Error {
+  /**
+   * Constructs an AuthorizationError with a specified message.
+   * Defaults to the HTTP status code 403 message if no message is provided.
+   * @param {string} [message=http.STATUS_CODES[403]] - The message to associate with this error.
+   */
+
   constructor(message = http.STATUS_CODES[403]) {
     super(message)
     this.message = message
@@ -24,6 +35,11 @@ class AuthorizationError extends Error {
 }
 
 class NotFoundError extends Error {
+  /**
+   * Construct a NotFoundError with a given message.
+   * @param {string} [message=http.STATUS_CODES[404]] - The message to be
+   *   associated with this error.
+   */
   constructor(message = http.STATUS_CODES[404]) {
     super(message)
     this.message = message
@@ -35,6 +51,11 @@ class NotFoundError extends Error {
 }
 
 class ServerError extends Error {
+  /**
+   * Construct a ServerError with a specified message.
+   * Defaults to the HTTP status code 500 message if no message is provided.
+   * @param {string} [message=http.STATUS_CODES[500]] - The message to associate with this error.
+   */
   constructor(message = http.STATUS_CODES[500]) {
     super(message)
     this.message = message
