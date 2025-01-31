@@ -22,24 +22,23 @@ const pagerMiddleware = require("../middleware/pager-middleware")
 const userMiddleware = require("../middleware/user-middleware")
 const routes = require("../routes")
 
-app.use(
-  cors({
-    origin: "https://blog.greg-p.keenetic.pro/",
-    exposeHeaders: ["Authorization"],
-    credentials: true,
-    allowMethods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
-    allowHeaders: ["Authorization", "Content-Type"],
-    exposedHeaders: ["Authorization"],
-    keepHeadersOnError: true,
-  }),
-)
+
 
 app.use(responseTime())
 app.use(xRequestId({ inject: true }, app))
 app.use(logger())
 app.use(helmet())
 
-
+app.use(
+  cors({
+    origin: "https://blog.greg-p.keenetic.pro/",
+    exposeHeaders: ["Authorization"],
+    credentials: true,
+    allowMethods: ["GET", "PUT", "POST", "DELETE"],
+    allowHeaders: ["Authorization", "Content-Type"],
+    keepHeadersOnError: true,
+  }),
+)
 
 app.use(camelizeMiddleware)
 
