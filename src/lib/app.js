@@ -26,6 +26,18 @@ app.use(responseTime())
 app.use(xRequestId({ inject: true }, app))
 app.use(logger())
 app.use(helmet())
+app.use(async (ctx, next) => {
+  if (ctx.method === "OPTIONS") {
+    ctx.set("Access-Control-Allow-Origin", "https://blog.greg-p.keenetic.pro");
+    ctx.set("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+    ctx.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
+    ctx.set("Access-Control-Expose-Headers", "Authorization");
+    ctx.set("Access-Control-Allow-Credentials", "true");
+    ctx.status = 204; // No Content
+  } else {
+    await next();
+  }
+});
 app.use(
   cors({
     origin: "https://blog.greg-p.keenetic.pro/",
@@ -33,6 +45,7 @@ app.use(
     credentials: true,
     allowMethods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
     allowHeaders: ["Authorization", "Content-Type"],
+    exposedHeaders: ["Authorization"],
     keepHeadersOnError: true,
   }),
 )
