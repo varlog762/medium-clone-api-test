@@ -28,7 +28,7 @@ app.use(logger())
 app.use(helmet())
 app.use(
   cors({
-    origin: "*",
+    origin: "https://blog.greg-p.keenetic.pro",
     exposeHeaders: ["Authorization"],
     credentials: true,
     allowMethods: ["GET", "PUT", "POST", "DELETE"],
