@@ -45,15 +45,15 @@ app.use(camelizeMiddleware);
 app.use(error);
 
 // Явная обработка OPTIONS-запросов
-app.use(async (ctx, next) => {
-  if (ctx.method === "OPTIONS") {
-    ctx.status = 204;
-    ctx.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    ctx.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
-    return;
-  }
-  await next();
-});
+// app.use(async (ctx, next) => {
+//   if (ctx.method === "OPTIONS") {
+//     ctx.status = 204;
+//     ctx.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//     ctx.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
+//     return;
+//   }
+//   await next();
+// });
 
 app.use(jwt);
 app.use(
