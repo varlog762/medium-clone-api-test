@@ -39,14 +39,6 @@ app.use(
   }),
 )
 
-app.use(async (ctx, next) => {
-  if (ctx.method === "OPTIONS") {
-    ctx.status = 204; // No Content
-    return;
-  }
-  await next();
-});
-
 app.use(camelizeMiddleware)
 
 app.use(error)
