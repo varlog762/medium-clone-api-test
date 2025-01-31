@@ -28,10 +28,7 @@ app.use(helmet());
 // Настройки CORS должны быть одними из первых middleware
 app.use(
   cors({
-    origin: [
-      "https://blog.greg-p.keenetic.pro",
-      "http://localhost:5400"
-    ],
+    origin: "https://blog.greg-p.keenetic.pro",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Authorization", "Content-Type"],
     exposeHeaders: ["Authorization"],
