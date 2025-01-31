@@ -31,7 +31,8 @@ app.use(helmet())
 
 app.use(
   cors({
-    origin: "https://blog.greg-p.keenetic.pro/",
+    // origin: "https://blog.greg-p.keenetic.pro/",
+    origin: "*",
     exposeHeaders: ["Authorization"],
     credentials: true,
     allowMethods: ["GET", "PUT", "POST", "DELETE"],
