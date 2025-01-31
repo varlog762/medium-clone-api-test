@@ -33,5 +33,5 @@ jobs:
           script: |
             cd ~/Data/docker-compose-files/medium-clone-api
             docker pull gashek762/medium-clone-api:latest
-            docker-compose down            
-            docker-compose up -d
+            docker compose down            
+            docker compose up -d
