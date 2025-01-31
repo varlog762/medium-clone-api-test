@@ -1,18 +1,15 @@
-version: '3'
-
 services:
   api:
-    build:
-      context: .
-    container_name: koa-knex-realworld-example-api
-    command: npm run start
+    image: gashek762/medium-clone-api:latest
+    container_name: medium-clone-api
     restart: unless-stopped
+    command: npm run start
     ports:
       - "3000:3000"
     volumes:
       - db:/usr/src/app/data
+    env_file:
+      - .env
 
 volumes:
   db:
-
-
